@@ -114,9 +114,11 @@ the tool (see the corresponding step of Initial Setup section below).
       the right-side three-dots button to select UPLOAD in the SDF drop-down
       menu (more info on how to use SDF in DBM [at this link](https://support.google.com/bidmanager/answer/6301070))
     - Upload the SDF/CSV file you previously downloaded
-    - If everything has worked correctly, you will see the updated settings you
+    - If there are no errors, you will see the updated settings you
       selected in the spreadsheet correctly applied to your destination Line
-      Items!
+      Items, and you can also check them running **Custom Functions >
+      Retrieve DESTINATION Line Items info** again so that you can check the
+      updated values in the destination Line Items.
 
 ## Additional info
 

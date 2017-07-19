@@ -17,19 +17,25 @@ Note that these code samples being shared are not official Google
 products and are not formally supported.
 ************************************************************************/
 
+// Constants for DBM API scopes and Rest API URLs.
 var DBM_API_SCOPE = 'https://www.googleapis.com/auth/doubleclickbidmanager';
-var API_URL_SDF = 'https://www.googleapis.com/doubleclickbidmanager/v1/sdf/download';
-var API_URL_QUERIES ='https://www.googleapis.com/doubleclickbidmanager/v1/queries';
-var API_URL_QUERY = 'https://www.googleapis.com/doubleclickbidmanager/v1/query';
-var API_URL_LIDL = 'https://www.googleapis.com/doubleclickbidmanager/v1/lineitems/downloadlineitems';
-var API_URL_LIUL = 'https://www.googleapis.com/doubleclickbidmanager/v1/lineitems/uploadlineitems';
+var API_URL_SDF =
+    'https://www.googleapis.com/doubleclickbidmanager/v1/sdf/download';
+
 var dbmApiService;
 var userProperties = PropertiesService.getUserProperties();
 var ui = SpreadsheetApp.getUi();
 
-/* ------------------------------------------------------------------------------------------------
- * MAIN API CALLS
- * ------------------------------------------------------------------------------------------------ */
+
+/*
+ * Calls the DBM API function to download SDF files.
+ * @param {string} filterType The type of filter to apply.
+ * @param {string[]} filterIds Array of IDs to filter on.
+ * @param {string} fileTypes The type of SDF file to download.
+ * @param {string=} sdfVersion The SDF version to use (defaults to 3).
+ * @return {Object} The parsed JSON object of the API response.
+ * @private
+ */
 function getSdf_(filterType, filterIds, fileTypes, sdfVersion) {
   var sdfV = sdfVersion || '3';
   var requestParameters = {
@@ -42,60 +48,29 @@ function getSdf_(filterType, filterIds, fileTypes, sdfVersion) {
   return JSON.parse(response);
 }
 
-function listQueries_() {
-  var response = callApi_(API_URL_QUERIES, 'GET', null);
-  return JSON.parse(response);
-}
 
-function createQuery_(requestParameters) {
-  Logger.log('Creating query with params:');
-  Logger.log(requestParameters);
-  var response = callApi_(API_URL_QUERY, 'POST', requestParameters);
-  return JSON.parse(response);
-}
-
-function runQuery_(queryId, dataRange) {
-  var requestParameters = {
-    "dataRange": dataRange
-  };
-  var response = callApi_(API_URL_QUERY + '/' + queryId, 'POST', requestParameters);
-  return response;
-}
-
-function getQuery_(queryId) {
-  var response = callApi_(API_URL_QUERY + '/' + queryId, 'GET', null);
-  return JSON.parse(response);
-}
-
-function downloadReport_(reportUrl) {
-  var response = UrlFetchApp.fetch(reportUrl);
-  return response;
-}
-
-function lineitemDownload_(filterType, filterIds) {
-  var requestParameters = {
-    "filterType": filterType,
-    "filterIds": filterIds,
-    "format": "CSV",
-    "fileSpec": "EWF"
-  };
-  var response = callApi_(API_URL_LIDL, 'POST', requestParameters);
-  return JSON.parse(response);
-}
-
-
-/* ------------------------------------------------------------------------------------------------
- * API HTTP CALL
- * ------------------------------------------------------------------------------------------------ */
+/*
+ * Calls the DBM API via an HTTP call, previously checking if the DBM API
+ * service is available and authorized, otherwise prompting the user to
+ * open the correct URL to authorize the API access.
+ * @param {string} url The URL of the REST API call to make.
+ * @param {string} methodType Value for the "method" option (GET/POST/...).
+ * @param {Object} requestBody The object containing the request parameters.
+ * @return {Object} The API call response.
+ * @private
+ */
 function callApi_(url, methodType, requestBody) {
   dbmApiService = dbmApiService|| getDbmApiService_();
   if (!dbmApiService.hasAccess()) {
     var authorizationUrl = dbmApiService.getAuthorizationUrl();
-    Logger.log('Open the following URL and re-run the script: ' + authorizationUrl);
-    var htmlOutput = HtmlService.createHtmlOutput('You need to authorize the tool to access the API using your credentials. <a href="' + authorizationUrl +
-        '" target="_blank">Click here to authorize the access to the API</a>, and then launch the command again.');
-    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Allow access to the DoubleClick API');
-    throw new Error('Missing access: open the following URL and re-run the script: ' + authorizationUrl);
+    var htmlOutput = HtmlService.createHtmlOutput('You need to authorize the ' +
+        'tool to access the API using your credentials. <a href="' +
+        authorizationUrl + '" target="_blank">Click here to authorize the ' +
+        'access to the API</a>, and then launch the command again.');
+    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Allow access to the ' +
+        'DoubleClick API');
+    throw new Error('Missing access: open the following URL and re-run the ' +
+        'script: ' + authorizationUrl);
   }
   var headers = {
         'Content-Type': 'application/json',
@@ -113,47 +88,49 @@ function callApi_(url, methodType, requestBody) {
   return UrlFetchApp.fetch(url, options);
 }
 
-/* ------------------------------------------------------------------------------------------------
- * API OAUTH2 HANDLING
- * ------------------------------------------------------------------------------------------------ */
 
+/*
+ * Stores the Google Cloud Project credential CLIENT ID and CLIENT SECRET as
+ * userProperties.
+ * @param {string} clientId The Client ID from GCP Credentials.
+ * @param {string} clientSecret The Client Secret from GCP Credentials.
+ * @private
+ */
 function setupApiCredentials_(clientId, clientSecret) {
   userProperties.setProperty('CLIENT_ID', clientId);
   userProperties.setProperty('CLIENT_SECRET', clientSecret);
 }
 
+
 /*
- * Returns the DBM API Service
+ * Creates the oAuth2-based DBM API service, using the Client ID and Secret
+ * provided by the user, and requesting the DBM API Scope.
+ * Function dbmAuthCallback_ is provided as callback function.
+ * @private
  */
 function getDbmApiService_() {
   // Create a new service with the given name. The name will be used when
   // persisting the authorized token, so ensure it is unique within the
   // scope of the property store.
   return OAuth2.createService('dbmApi')
-      // Set the endpoint URLs, which are the same for all Google services.
       .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
       .setTokenUrl('https://accounts.google.com/o/oauth2/token')
-      // Set the client ID and secret, from the Google Developers Console.
       .setClientId(userProperties.getProperty('CLIENT_ID'))
       .setClientSecret(userProperties.getProperty('CLIENT_SECRET'))
-      // Set the name of the callback function in the script referenced
-      // above that should be invoked to complete the OAuth flow.
       .setCallbackFunction('dbmAuthCallback_')
-      // Set the property store where authorized tokens should be persisted.
       .setPropertyStore(PropertiesService.getUserProperties())
-      // Set the scopes to request (space-separated for Google services).
       .setScope(DBM_API_SCOPE)
-      // Below are Google-specific OAuth2 parameters.
-      // Sets the login hint, which will prevent the account chooser screen
-      // from being shown to users logged in with multiple accounts.
       .setParam('login_hint', Session.getActiveUser().getEmail())
-      // Requests offline access.
       .setParam('access_type', 'offline')
-      // Forces the approval prompt every time. This is useful for testing,
-      // but not desirable in a production application.
       .setParam('approval_prompt', 'force');
 }
 
+
+/*
+ * The callback function for the DBM API service request.
+ * @return {string} The result of the authorization request.
+ * @private
+ */
 function dbmAuthCallback_(request) {
   var service = getDbmApiService_();
   var isAuthorized = service.handleCallback(request);
@@ -165,10 +142,11 @@ function dbmAuthCallback_(request) {
 }
 
 
-
 /*
  * Given a source sheet, returns an object with the column names as key
- * and an array of the column values as value
+ * and an array of the column values as value.
+ * @params {Spreadsheet}
+ * @return {Object} An Object mapped to the input sheet content.
  */
 function populateObject_(sheet) {
   var resultObject = {};
