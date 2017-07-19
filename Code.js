@@ -68,17 +68,18 @@ function onOpen() {
  */
 function customOnEdit(e){
   var range = e.range;
-  Logger.log(e);
-  Logger.log(range);
   if (range.getRow() == ROW_SETTING && range.getColumn() == 2) {
-    // The selected setting has changed, we clear the corresponding retrieved value for origin/destination LIs
+    // The selected setting has changed, we clear the corresponding retrieved
+    // value for origin/destination LIs.
     clearOriginInfo_();
     clearDestinationInfo_(false);
   } else if (range.getRow() == ROW_ORIGIN_LI_ID && range.getColumn() == 2){
-    // The origin Line Item ID has been changed, let's clear the corresponding retrieved values
+    // The origin Line Item ID has been changed, let's clear the corresponding
+    // retrieved values.
     clearOriginInfo_();
   } else if (range.getRow() >= ROW_DESTINATION_LI && range.getColumn() == 1) {
-    // One (or more) destination LI IDs have been changed, let's clear the corresponding retrieved values
+    // One (or more) destination LI IDs have been changed, let's clear the
+    // corresponding retrieved values.
     for (var row = range.getRow(); row<= range.getLastRow(); row++) {
       clearDestinationInfo_(true, row);
     }
@@ -160,13 +161,19 @@ function retrieveDestinationLis_() {
   var sdfResponse = getSdf_(FILTER_LI, liIds, ["LINE_ITEM"], sdfVersion);
   var destinationLiData = Utilities.parseCsv(sdfResponse['lineItems']);
   destinationLisSheet.clearContents();
-  destinationLisSheet.getRange(1,1, destinationLiData.length, destinationLiData[0].length).setValues(destinationLiData);
+  destinationLisSheet.getRange(1,1, destinationLiData.length,
+      destinationLiData[0].length).setValues(destinationLiData);
   destinationLiObject = populateObject_(destinationLisSheet);
-  for (var row=ROW_DESTINATION_LI; row < configSheet.getDataRange().getNumRows() +1; row++) {
+  for (var row=ROW_DESTINATION_LI;
+       row < configSheet.getDataRange().getNumRows() +1; row++) {
     // Log the current value of the destination LIs setting
-    configSheet.getRange(row,1).setValue(destinationLiObject[SDF_ID][row - ROW_DESTINATION_LI]);
-    configSheet.getRange(row,2).setValue(destinationLiObject[SDF_NAME][row - ROW_DESTINATION_LI]);
-    configSheet.getRange(row,3).setValue(destinationLiObject[selectedSetting][row - ROW_DESTINATION_LI]);
+    configSheet.getRange(row,1)
+        .setValue(destinationLiObject[SDF_ID][row -ROW_DESTINATION_LI]);
+    configSheet.getRange(row,2)
+        .setValue(destinationLiObject[SDF_NAME][row - ROW_DESTINATION_LI]);
+    configSheet.getRange(row,3)
+        .setValue(destinationLiObject[selectedSetting][row -
+                                                       ROW_DESTINATION_LI]);
 
   }
   return;
@@ -198,7 +205,8 @@ function updateDestinationLis_(settingValue) {
  * @private
  */
 function clearOriginInfo_() {
-  configSheet.getRange(ROW_ORIGIN_LI_NAME,2, ROW_ORIGIN_LI_VALUE - ROW_ORIGIN_LI_NAME + 1, 1).clearContent();
+  configSheet.getRange(ROW_ORIGIN_LI_NAME,2,
+      ROW_ORIGIN_LI_VALUE - ROW_ORIGIN_LI_NAME + 1, 1).clearContent();
 }
 
 
@@ -214,7 +222,9 @@ function clearDestinationInfo_(clearName, row) {
   if (row) {
     configSheet.getRange(row,startingColumn, 1, columnsToClear).clearContent();
   } else {
-    configSheet.getRange(ROW_DESTINATION_LI,startingColumn, configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1, columnsToClear).clearContent();
+    configSheet.getRange(ROW_DESTINATION_LI,startingColumn,
+        configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1,
+        columnsToClear).clearContent();
   }
 }
 
@@ -226,7 +236,9 @@ function clearDestinationInfo_(clearName, row) {
  * @private
  */
 function isDestinationInfoLoaded_() {
-  var liNames = configSheet.getRange(ROW_DESTINATION_LI,2, configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1, 1).getValues();
+  var liNames = configSheet.getRange(ROW_DESTINATION_LI,2,
+      configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1, 1)
+      .getValues();
   for (var i=0; i<liNames.length; i++) {
     if (liNames[i][0].length < 1) {
       return false;
@@ -237,7 +249,8 @@ function isDestinationInfoLoaded_() {
 
 
 /*
- * Inits the tool and and calls the function to retrieve ORIGIN Line Item settings.
+ * Inits the tool and and calls the function to retrieve ORIGIN Line Item
+ * settings.
  * @private
  */
 function getOrigin_() {
@@ -285,7 +298,9 @@ function copyLiSetting_() {
 function reset_() {
   //configSheet.getRange(ROW_SETTING,2).clearContent();
   configSheet.getRange(ROW_ORIGIN_LI_ID,2).clearContent();
-  configSheet.getRange(ROW_DESTINATION_LI,1,configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1,1).clearContent();
+  configSheet.getRange(ROW_DESTINATION_LI,1,
+      configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1,1)
+      .clearContent();
   clearOriginInfo_();
   clearDestinationInfo_(true);
   userProperties.setProperty('haschanges', 'false');
