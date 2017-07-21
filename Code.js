@@ -435,12 +435,13 @@ function copyLiSetting_() {
   return;
 }
 
+
 /*
  * Resets all user-inserted values.
  * @private
  */
 function reset_() {
-  //configSheet.getRange(ROW_SETTING,2).clearContent();
+  init_();
   configSheet.getRange(ROW_ORIGIN_LI_ID,2).clearContent();
   configSheet.getRange(ROW_DESTINATION_LI,1,
       configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1,1)
