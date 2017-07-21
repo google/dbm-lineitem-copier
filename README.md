@@ -30,7 +30,7 @@ the tool (see the corresponding step of Initial Setup section below).
 ## INITIAL SETUP
 
 *   Create a new [Google Spreadsheet](https://sheets.google.com) and open its
-    script editor (from __Tools > Script Editor_)
+    script editor (from _Tools > Script Editor_)
     - Copy the code from Code.js and Utilities.js in two corresponding files in
     your AppScript project
     - Add the OAuth2 library clicking on _Resources > Libraries_ and entering
