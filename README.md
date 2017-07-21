@@ -29,10 +29,12 @@ the tool (see the corresponding step of Initial Setup section below).
 
 ## INITIAL SETUP
 
-*   Create a copy of the sample spreadsheet at: https://goo.gl/xJoRd4. This
-    document includes the AppScript code included in this project which is used
-    to connect to the API and manages all the custom functionalities.
-*   Access the AppScript files from _Tools > Script Editor_
+*   Create a new [Google Spreadsheet](https://sheets.google.com) and open its
+    script editor (from __Tools > Script Editor_)
+    - Copy the code from Code.js and Utilities.js in two corresponding files in
+    your AppScript project
+    - Add the OAuth2 library clicking on _Resources > Libraries_ and entering
+    the corresponding project key: "MswhXl8fVhTFUH_Q3UOJbXvxhMjh3Sh48".
     - Take note of the "Script ID" you can find at _File > Project Properties >
     Script ID_
 *   Create a new Google Cloud Project (or use an existing one), and enable the
@@ -52,10 +54,11 @@ the tool (see the corresponding step of Initial Setup section below).
 *   Get back to your AppScript code, and open the Code.gs file. Fill the values
     for the **CLIENT_ID** and **CLIENT_SECRET** constants at the beginning of
     the file using the values you obtained from the Cloud Console.
-*   Go back to the Spreadsheet, click on the _Custom Functions_ menu, and
-    select _Retrieve ORIGIN Line Item Info_: you will be prompted to allow the
-    tool to access the Spreadsheet and to use your DBM API credentials to
-    download the SDF files. This only needs to be done once (per user).
+*   Go back to the Spreadsheet, click on the _Custom Functions_ menu (you might
+    need to refresh the page if you don't see it), and select _Retrieve ORIGIN
+    Line Item Info_: you will be prompted to allow the tool to access the
+    Spreadsheet and to use your DBM API credentials to download the SDF files.
+    This only needs to be done once (per user).
 
 ## USAGE
 

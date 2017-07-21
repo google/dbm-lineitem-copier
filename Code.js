@@ -21,14 +21,29 @@ products and are not formally supported.
 var CLIENT_ID = '[REPLACE WITH YOUR CLIENT_ID]';
 var CLIENT_SECRET = '[REPLACE WITH YOUR CLIENT_SECRET]';
 
+// Sheet Names
+var CONFIG_SHEET_NAME = 'Config';
+var ORIGIN_SHEET_NAME = 'OriginLI';
+var DESTINATION_SHEET_NAME = 'DestinationLIs';
+
 // Constants with references to specific cells in the Config sheet
 // (update these values if for any reason you're editing the sheet)
+var ROW_GENERAL_HEADER = 1;
 var ROW_SDF_VERSION = 2;
 var ROW_SETTING = 3;
-var ROW_ORIGIN_LI_ID = 6;
-var ROW_ORIGIN_LI_NAME = 7;
-var ROW_ORIGIN_LI_VALUE = 8;
-var ROW_DESTINATION_LI = 12;
+var ROW_ORIGIN_HEADER = 4;
+var ROW_ORIGIN_LI_ID = 5;
+var ROW_ORIGIN_LI_NAME = 6;
+var ROW_ORIGIN_LI_VALUE = 7;
+var ROW_DESTINATION_HEADER = 8;
+var ROW_DESTINATION_COLUMNS = 9;
+var ROW_DESTINATION_LI = 10;
+var NUM_COLUMNS = 4;
+var CONFIG_HEADERS_COLOR = '#93C47D';
+var CONFIG_NAMES_COLOR = '#A4C2F4';
+var CONFIG_EDITABLE_VALUES_COLOR = 'cyan';
+var CONFIG_AUTOMATIC_VALUES_COLOR = '#EFEFEF';
+var CONFIG_DESCRIPTIONS_COLOR = '#D9EAD3';
 
 // Constants from the SDF request filter and response headers
 var FILTER_LI = 'LINE_ITEM_ID';
@@ -36,11 +51,7 @@ var SDF_ID = 'Line Item Id';
 var SDF_NAME = 'Name';
 
 var doc = SpreadsheetApp.getActiveSpreadsheet();
-var configSheet = doc.getSheetByName('Config');
-var originLiSheet = doc.getSheetByName('OriginLI');
-var destinationLisSheet = doc.getSheetByName('DestinationLIs');
-var selectedSetting;
-var originLiId;
+var configSheet,originLiSheet,destinationLisSheet,selectedSetting,originLiId;
 var originLiObject = {};
 var destinationLiObject = {};
 
@@ -93,6 +104,13 @@ function customOnEdit(e){
  * @private
  */
 function init_() {
+  configSheet = doc.getSheetByName(CONFIG_SHEET_NAME);
+  originLiSheet = doc.getSheetByName(ORIGIN_SHEET_NAME);
+  destinationLisSheet = doc.getSheetByName(DESTINATION_SHEET_NAME);
+  if (!(configSheet & originLiSheet & destinationLisSheet)) {
+    // We need setup and format the spreadsheet
+    initSpreadsheet_();
+  }
   setupApiCredentials_(CLIENT_ID, CLIENT_SECRET);
   selectedSetting = configSheet.getRange(ROW_SETTING,2).getValue();
   var allTriggers = ScriptApp.getProjectTriggers();
@@ -102,6 +120,129 @@ function init_() {
       .forSpreadsheet(doc)
       .onEdit()
       .create();
+  }
+  doc.setActiveSheet(configSheet);
+}
+
+
+/*
+ * Sets up and formats the needed sheets in the Spreadsheet: "Config" with the
+ * configuration settings, "OriginLI" to host the origin Line Item info,
+ * "Destination LIs" to host the destination Line Items info.
+ * @private
+ */
+function initSpreadsheet_() {
+  if (!originLiSheet) {
+    doc.insertSheet(ORIGIN_SHEET_NAME,0);
+    originLiSheet = doc.getSheetByName(ORIGIN_SHEET_NAME);
+    originLiSheet.setTabColor("yellow");
+    originLiSheet.getRange(1,1,1,100).setBackground("yellow");
+    originLiSheet.getRange(1,1,originLiSheet.getMaxRows(),
+        originLiSheet.getMaxColumns()).setFontFamily('Roboto Slab');
+  }
+  if (!destinationLisSheet) {
+    doc.insertSheet(DESTINATION_SHEET_NAME,1);
+    destinationLisSheet = doc.getSheetByName(DESTINATION_SHEET_NAME);
+    destinationLisSheet.setTabColor("green");
+    destinationLisSheet.getRange(1,1,1,100).setBackground("green");
+    destinationLisSheet.getRange(1,1,destinationLisSheet.getMaxRows(),
+        destinationLisSheet.getMaxColumns()).setFontFamily('Roboto Slab');
+  }
+  if (!configSheet) {
+    doc.insertSheet(CONFIG_SHEET_NAME,0);
+    configSheet = doc.getSheetByName(CONFIG_SHEET_NAME);
+    configSheet.setTabColor('red');
+    // Sets default column widths.
+    configSheet.setColumnWidth(1, 260);
+    configSheet.setColumnWidth(2, 280);
+    configSheet.setColumnWidth(3, 360);
+    configSheet.setColumnWidth(4, 360);
+    // General settings section.
+    configSheet.getRange(ROW_GENERAL_HEADER,1,1,NUM_COLUMNS)
+        .setBackground(CONFIG_HEADERS_COLOR).setFontWeight('bold');
+    configSheet.setRowHeight(ROW_GENERAL_HEADER, 40);
+    configSheet.getRange(ROW_GENERAL_HEADER,1).setValue('General settings');
+    configSheet.getRange(ROW_SDF_VERSION,1,2,1)
+        .setBackground(CONFIG_NAMES_COLOR).setFontWeight('bold');
+    configSheet.getRange(ROW_SDF_VERSION,1).setValue('SDF Version');
+    configSheet.getRange(ROW_SETTING,1).setValue('Line Item setting to copy');
+    configSheet.getRange(ROW_SDF_VERSION,2,2,1)
+        .setBackground(CONFIG_EDITABLE_VALUES_COLOR).setFontWeight('bold')
+        .setHorizontalAlignment('center');
+    var rule = SpreadsheetApp.newDataValidation()
+        .requireValueInList(['3', '3.1']).build();
+    configSheet.getRange(ROW_SDF_VERSION,2).setDataValidation(rule)
+        .setValue('3.1');
+    var range = originLiSheet.getRange('1:1');
+    rule = SpreadsheetApp.newDataValidation().requireValueInRange(range)
+        .build();
+    configSheet.getRange(ROW_SETTING,2).setDataValidation(rule)
+      .setValue('Geography Targeting - Include');
+    configSheet.getRange(ROW_SDF_VERSION,3,2,2)
+        .setBackground(CONFIG_DESCRIPTIONS_COLOR);
+    configSheet.getRange(ROW_SDF_VERSION,3)
+        .setValue('Check your advertiser/partner supported SDF version ' +
+        'directly in DBM');
+    configSheet.getRange(ROW_SETTING,3).setValue('<-- if this menu is empty, ' +
+        'select an ORIGIN line item below and run "Custom Functions > ' +
+        'Retrieve ORIGIN Line Item Info"');
+    // Origin Line Item section.
+    configSheet.getRange(ROW_ORIGIN_HEADER,1,1,NUM_COLUMNS)
+        .setBackground(CONFIG_HEADERS_COLOR).setFontWeight('bold');
+    configSheet.setRowHeight(ROW_ORIGIN_HEADER, 40);
+    configSheet.getRange(ROW_ORIGIN_HEADER,1)
+        .setFormula('=CONCATENATE("ORIGIN Line Item - the Line Item to copy ' +
+        'the selected setting ("; $B$3; ") from")');
+    configSheet.getRange(ROW_ORIGIN_LI_ID,1,3,1)
+        .setBackground(CONFIG_NAMES_COLOR).setFontWeight('bold');
+    configSheet.setRowHeight(ROW_ORIGIN_LI_ID, 40);
+    configSheet.setRowHeight(ROW_ORIGIN_LI_NAME, 40);
+    configSheet.setRowHeight(ROW_ORIGIN_LI_VALUE, 40);
+    configSheet.getRange(ROW_ORIGIN_LI_ID,1).setValue('Line Item ID');
+    configSheet.getRange(ROW_ORIGIN_LI_NAME,1).setValue('Line Item Name');
+    configSheet.getRange(ROW_ORIGIN_LI_VALUE,1)
+        .setFormula('= CONCATENATE("Value for: "; $B$3)');
+    configSheet.getRange(ROW_ORIGIN_LI_ID,2)
+        .setBackground(CONFIG_EDITABLE_VALUES_COLOR).setFontWeight('bold')
+        .setHorizontalAlignment('center');
+    configSheet.getRange(ROW_ORIGIN_LI_NAME,2,2,1)
+        .setBackground(CONFIG_AUTOMATIC_VALUES_COLOR).setFontWeight('bold')
+        .setHorizontalAlignment('center');
+    configSheet.getRange(ROW_ORIGIN_LI_ID,3,3,2)
+        .setBackground(CONFIG_DESCRIPTIONS_COLOR);
+    configSheet.getRange(ROW_ORIGIN_LI_ID,3,1,2).merge().setWrap(true)
+        .setValue('The ID of the Line Item you want to copy the setting FROM');
+    configSheet.getRange(ROW_ORIGIN_LI_NAME,3,1,2).merge().setWrap(true)
+        .setValue('Run "Custom Functions > Retrieve ORIGIN Line Item Info" ' +
+        'to load the LI Name and the current value for the selected setting ' +
+        '(Keyword Targeting - Include)');
+    configSheet.getRange(ROW_ORIGIN_LI_VALUE,3,1,2).merge().setWrap(true)
+        .setFormula('=CONCATENATE("This is the value for "; $B$3; " which is ' +
+        'gonna be copied into the DESTINATION Line Items below")');
+    // Destination Line Items section.
+    configSheet.getRange(ROW_DESTINATION_HEADER,1,1,NUM_COLUMNS)
+        .setBackground(CONFIG_HEADERS_COLOR).setFontWeight('bold');
+    configSheet.setRowHeight(ROW_DESTINATION_HEADER, 40);
+    configSheet.getRange(ROW_DESTINATION_HEADER,1,1,4).merge().setWrap(true)
+        .setValue('DESTINATION Line Items - the Line Item(s) you want to ' +
+        'copy the selected setting TO.');
+    configSheet.getRange(ROW_DESTINATION_COLUMNS,1,1,NUM_COLUMNS)
+        .setBackground(CONFIG_NAMES_COLOR).setFontWeight('bold');
+    configSheet.getRange(ROW_DESTINATION_COLUMNS,1)
+        .setValue('Destination Line Item IDs');
+    configSheet.getRange(ROW_DESTINATION_COLUMNS,2).setValue('Line Item Name');
+    configSheet.getRange(ROW_DESTINATION_COLUMNS,3)
+        .setFormula('= CONCATENATE("Current value for: "; $B$3)');
+    configSheet.getRange(ROW_DESTINATION_COLUMNS,4)
+        .setFormula('= CONCATENATE("New value applied for: "; $B$3)');
+    configSheet.getRange(ROW_DESTINATION_LI,1,100,1).setFontWeight('bold')
+        .setBackground(CONFIG_EDITABLE_VALUES_COLOR)
+        .setHorizontalAlignment('center');
+    configSheet.getRange(ROW_DESTINATION_LI,2,100,3).setFontWeight('bold')
+        .setBackground(CONFIG_AUTOMATIC_VALUES_COLOR);
+    configSheet.getRange(1,1,configSheet.getMaxRows(),
+        configSheet.getMaxColumns()).setFontFamily('Roboto Slab')
+        .setVerticalAlignment("middle");;
   }
 }
 
@@ -113,6 +254,9 @@ function init_() {
  */
 function retrieveOriginLi_() {
   originLiId = configSheet.getRange(ROW_ORIGIN_LI_ID,2).getValue();
+  if (!originLiId) {
+    throw new Error('You need to specify an origin Line Item ID');
+  }
   var sdfVersion = configSheet.getRange(ROW_SDF_VERSION,2).getValue();
   var sdfResponse = getSdf_(FILTER_LI, [originLiId], ["LINE_ITEM"], sdfVersion);
   var originLiData = Utilities.parseCsv(sdfResponse['lineItems']);
