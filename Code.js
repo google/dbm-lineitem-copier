@@ -78,6 +78,7 @@ function onOpen() {
  * @params (Object) e The event object from the onEdit trigger.
  */
 function customOnEdit(e){
+  configSheet = doc.getSheetByName(CONFIG_SHEET_NAME);
   var range = e.range;
   if (range.getRow() == ROW_SETTING && range.getColumn() == 2) {
     // The selected setting has changed, we clear the corresponding retrieved
