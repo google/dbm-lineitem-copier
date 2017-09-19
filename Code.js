@@ -368,7 +368,7 @@ function clearDestinationInfo_(clearName, row) {
     configSheet.getRange(row,startingColumn, 1, columnsToClear).clearContent();
   } else {
     configSheet.getRange(ROW_DESTINATION_LI,startingColumn,
-        configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1,
+        configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 2,
         columnsToClear).clearContent();
   }
 }
@@ -382,7 +382,7 @@ function clearDestinationInfo_(clearName, row) {
  */
 function isDestinationInfoLoaded_() {
   var liNames = configSheet.getRange(ROW_DESTINATION_LI,2,
-      configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 1, 1)
+      configSheet.getDataRange().getNumRows() - ROW_DESTINATION_LI + 2, 1)
       .getValues();
   for (var i=0; i<liNames.length; i++) {
     if (liNames[i][0].length < 1) {

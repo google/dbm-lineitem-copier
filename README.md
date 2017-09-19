@@ -31,10 +31,11 @@ the tool (see the corresponding step of Initial Setup section below).
 
 *   Create a new [Google Spreadsheet](https://sheets.google.com) and open its
     script editor (from _Tools > Script Editor_)
-    - Copy the code from Code.js and Utilities.js in two corresponding files in
-    your AppScript project
+    - Copy the code from Code.js and Utilities.js in two corresponding Code.gs,
+    Utilities.gs files in your AppScript project
     - Add the OAuth2 library clicking on _Resources > Libraries_ and entering
-    the corresponding project key: "MswhXl8fVhTFUH_Q3UOJbXvxhMjh3Sh48".
+    the corresponding script ID:
+    "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF".
     - Take note of the "Script ID" you can find at _File > Project Properties >
     Script ID_
 *   Create a new Google Cloud Project (or use an existing one), and enable the
