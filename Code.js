@@ -64,7 +64,9 @@ function onOpen() {
   ui.createMenu('Custom Functions')
       .addItem('Retrieve ORIGIN Line Item info', 'getOrigin_')
       .addItem('Retrieve DESTINATION Line Items info', 'getDestination_')
+      .addSeparator()
       .addItem('Copy Line Item setting', 'copyLiSetting_')
+      .addSeparator()
       .addItem('Reset', 'reset_')
       .addToUi();
   // Resets the flag to track changes made by the user.
@@ -171,9 +173,9 @@ function initSpreadsheet_() {
         .setBackground(CONFIG_EDITABLE_VALUES_COLOR).setFontWeight('bold')
         .setHorizontalAlignment('center');
     var rule = SpreadsheetApp.newDataValidation()
-        .requireValueInList(['3', '3.1']).build();
+        .requireValueInList(['3.1', '4']).build();
     configSheet.getRange(ROW_SDF_VERSION,2).setDataValidation(rule)
-        .setValue('3.1');
+        .setValue('4');
     var range = originLiSheet.getRange('1:1');
     rule = SpreadsheetApp.newDataValidation().requireValueInRange(range)
         .build();
