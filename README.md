@@ -33,33 +33,21 @@ the tool (see the corresponding step of Initial Setup section below).
     script editor (from _Tools > Script Editor_)
     - Copy the code from Code.js and Utilities.js in two corresponding Code.gs,
     Utilities.gs files in your AppScript project
-    - Add the OAuth2 library clicking on _Resources > Libraries_ and entering
-    the corresponding script ID:
-    "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF".
-    - Take note of the "Script ID" you can find at _File > Project Properties >
-    Script ID_
-*   Create a new Google Cloud Project (or use an existing one), and enable the
-    DoubleClick Bid Manager APIs from the [API Manager page](https://console.cloud.google.com/apis).
-*   Generate new Credentials for the tool:
-    - Use the oAuth Client ID credential type and the Web Application
-    application type.
-    - Add the following URLs to the "Authorized redirect URIs", replacing
-      [script id] with the actual Script ID you retrieved from your AppScript
-      project:
-      - https://script.google.com/oauthcallback
-      - https://script.google.com/macros/d/[script id]/usercallback
-    - Once the new Credentials have been created, take note of the _Client ID_
-      and the _Client Secret_
-    - Please refer to the [Google Cloud documentation](https://cloud.google.com)
-      for any additional information on how to create a Project or enable APIs.
-*   Get back to your AppScript code, and open the Code.gs file. Fill the values
-    for the **CLIENT_ID** and **CLIENT_SECRET** constants at the beginning of
-    the file using the values you obtained from the Cloud Console.
-*   Go back to the Spreadsheet, click on the _Custom Functions_ menu (you might
-    need to refresh the page if you don't see it), and select _Retrieve ORIGIN
-    Line Item Info_: you will be prompted to allow the tool to access the
-    Spreadsheet and to use your DBM API credentials to download the SDF files.
-    This only needs to be done once (per user).
+    - Click on _View > Show manifest file_ to access file appsscript.json, and
+    copy the content of file appsscript.json from this project (or even just the
+    _oauthScopes_ object) into that file.
+    - Click on _Resources > Cloud Platform Project_.  In the following pop-up
+    window, click on the blue link to access the Cloud Platform project which
+    has automatically been created for the tool.
+    - From the Cloud Platform console, open the left-side menu and select "API &
+    Services > Library". Search for "DoubleClick Bid Manager API", select it,
+    and click on "Enable". You can now close this tab and the Script Editor tab,
+    and go back to the Spreadsheet.
+*   Click on the _Custom Functions_ menu (you might need to refresh the page if
+    you don't see it), and select _Retrieve ORIGIN Line Item Info_: you will be
+    prompted to allow the tool to access the Spreadsheet and to use your DBM API
+    credentials to download the SDF files. This only needs to be done once (per
+    user).
 
 ## USAGE
 

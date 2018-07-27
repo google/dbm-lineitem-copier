@@ -17,10 +17,6 @@ Note that these code samples being shared are not official Google
 products and are not formally supported.
 ************************************************************************/
 
-// Google Cloud Project Authorization details
-var CLIENT_ID = '[REPLACE WITH YOUR CLIENT_ID]';
-var CLIENT_SECRET = '[REPLACE WITH YOUR CLIENT_SECRET]';
-
 // Sheet Names
 var CONFIG_SHEET_NAME = 'Config';
 var ORIGIN_SHEET_NAME = 'OriginLI';
@@ -56,7 +52,7 @@ var originLiObject = {};
 var destinationLiObject = {};
 
 
-/*
+/**
  * Creates the "Custom Functions" menu.
  */
 function onOpen() {
@@ -74,7 +70,7 @@ function onOpen() {
 }
 
 
-/*
+/**
  * Function triggered on edit to clear some fields when the user manually
  * updates some specific cells.
  * @params (Object) e The event object from the onEdit trigger.
@@ -101,7 +97,7 @@ function customOnEdit(e){
 }
 
 
-/*
+/**
  * Initialization function to save the API credentials, retrieve the current
  * selected setting and create the "on edit" trigger if doesn't exist already.
  * @private
@@ -114,7 +110,6 @@ function init_() {
     // We need setup and format the spreadsheet
     initSpreadsheet_();
   }
-  setupApiCredentials_(CLIENT_ID, CLIENT_SECRET);
   selectedSetting = configSheet.getRange(ROW_SETTING,2).getValue();
   var allTriggers = ScriptApp.getProjectTriggers();
   if (allTriggers.length == 0) {
@@ -128,7 +123,7 @@ function init_() {
 }
 
 
-/*
+/**
  * Sets up and formats the needed sheets in the Spreadsheet: "Config" with the
  * configuration settings, "OriginLI" to host the origin Line Item info,
  * "Destination LIs" to host the destination Line Items info.
@@ -245,12 +240,12 @@ function initSpreadsheet_() {
         .setBackground(CONFIG_AUTOMATIC_VALUES_COLOR);
     configSheet.getRange(1,1,configSheet.getMaxRows(),
         configSheet.getMaxColumns()).setFontFamily('Roboto Slab')
-        .setVerticalAlignment("middle");;
+        .setVerticalAlignment("middle");
   }
 }
 
 
-/*
+/**
  * Retrieves ORIGIN Line Item information, loading the SDF file via the DBM API.
  * @return {string} Value of the selected setting in the ORIGIN Line Item.
  * @private
@@ -275,7 +270,7 @@ function retrieveOriginLi_() {
 }
 
 
-/*
+/**
  * Retrieves DESTINATION Line Items information, loading the SDF file via the
  * DBM API. If the user has already made some changes, has the options to abort
  * the operation to avoid overwriting uncommitted updates.
@@ -327,7 +322,7 @@ function retrieveDestinationLis_() {
 }
 
 
-/*
+/**
  * Updates the "new value" of the selected setting for the DESTINATION Line
  * Items in the Config sheet, using the corresponding value from the ORIGIN Line
  * Item.
@@ -346,7 +341,7 @@ function updateDestinationLis_(settingValue) {
 }
 
 
-/*
+/**
  * Clears the information (name and current setting value) of the ORIGIN Line
  * Item in the Config Sheet.
  * @private
@@ -357,7 +352,7 @@ function clearOriginInfo_() {
 }
 
 
-/*
+/**
  * Clears the information of the DESTINATION Line Items in the Config Sheet.
  * @param {Boolean} clearName Whether to clear the column containing the name.
  * @param {Number=} row Row to clear (all if not specified)
@@ -376,7 +371,7 @@ function clearDestinationInfo_(clearName, row) {
 }
 
 
-/*
+/**
  * Checks if the DESTINATION Line Items information has already been loaded,
  * checking if the "Name" column is populated for all the rows.
  * @return {Boolean} Whether the information has already been loaded.
@@ -395,7 +390,7 @@ function isDestinationInfoLoaded_() {
 }
 
 
-/*
+/**
  * Inits the tool and and calls the function to retrieve ORIGIN Line Item
  * settings.
  * @private
@@ -406,7 +401,7 @@ function getOrigin_() {
 }
 
 
-/*
+/**
  * Inits the tool and calls the function to retrieve DESTINATION Line Items
  * settings.
  * @private
@@ -417,7 +412,7 @@ function getOrigin_() {
 }
 
 
-/*
+/**
  * Copies the value of the ORIGIN Line Item setting to the DESTINATION Line
  * Items settings.
  * @private
@@ -439,7 +434,7 @@ function copyLiSetting_() {
 }
 
 
-/*
+/**
  * Resets all user-inserted values.
  * @private
  */
