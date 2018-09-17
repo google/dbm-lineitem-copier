@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright 2017 Google Inc.
+Copyright 2018 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,8 +46,8 @@ var FILTER_LI = 'LINE_ITEM_ID';
 var SDF_ID = 'Line Item Id';
 var SDF_NAME = 'Name';
 
-var doc = SpreadsheetApp.getActiveSpreadsheet();
-var configSheet,originLiSheet,destinationLisSheet,selectedSetting,originLiId;
+var doc, configSheet, originLiSheet, destinationLisSheet, selectedSetting,
+    originLiId;
 var originLiObject = {};
 var destinationLiObject = {};
 
@@ -76,6 +76,12 @@ function onOpen() {
  * @params (Object) e The event object from the onEdit trigger.
  */
 function customOnEdit(e){
+  try {
+    doc = SpreadsheetApp.getActiveSpreadsheet();
+  } catch (e) {
+    // Silent fail.
+    return;
+  }
   configSheet = doc.getSheetByName(CONFIG_SHEET_NAME);
   var range = e.range;
   if (range.getRow() == ROW_SETTING && range.getColumn() == 2) {
@@ -103,6 +109,7 @@ function customOnEdit(e){
  * @private
  */
 function init_() {
+  doc = SpreadsheetApp.getActiveSpreadsheet();
   configSheet = doc.getSheetByName(CONFIG_SHEET_NAME);
   originLiSheet = doc.getSheetByName(ORIGIN_SHEET_NAME);
   destinationLisSheet = doc.getSheetByName(DESTINATION_SHEET_NAME);
@@ -180,7 +187,7 @@ function initSpreadsheet_() {
         .setBackground(CONFIG_DESCRIPTIONS_COLOR);
     configSheet.getRange(ROW_SDF_VERSION,3)
         .setValue('Check your advertiser/partner supported SDF version ' +
-        'directly in DBM');
+        'directly in DV360');
     configSheet.getRange(ROW_SETTING,3).setValue('<-- if this menu is empty, ' +
         'select an ORIGIN line item below and run "Custom Functions > ' +
         'Retrieve ORIGIN Line Item Info"');
@@ -246,7 +253,7 @@ function initSpreadsheet_() {
 
 
 /**
- * Retrieves ORIGIN Line Item information, loading the SDF file via the DBM API.
+ * Retrieves ORIGIN Line Item information, loading the SDF file via DV360 API.
  * @return {string} Value of the selected setting in the ORIGIN Line Item.
  * @private
  */
@@ -272,8 +279,8 @@ function retrieveOriginLi_() {
 
 /**
  * Retrieves DESTINATION Line Items information, loading the SDF file via the
- * DBM API. If the user has already made some changes, has the options to abort
- * the operation to avoid overwriting uncommitted updates.
+ * DV360 API. If the user has already made some changes, has the options to
+ * abort the operation to avoid overwriting uncommitted updates.
  * @return {string=} 'abort' if the user aborts the operation.
  * @private
  */
@@ -282,10 +289,10 @@ function retrieveDestinationLis_() {
   // Checks if the user has made changes so far, and eventually shows a warning.
   var hasChanges = userProperties.getProperty('haschanges');
   if (hasChanges == 'true') {
-    var response = ui.alert('You are about to download the current DBM ' +
+    var response = ui.alert('You are about to download the current DV360 ' +
         'settings values for the destination Line Items. They will overwrite ' +
         'any change you have already made, unless you have already uploaded ' +
-        'the resulting SDF file to DBM. Do you wish to continue?',
+        'the resulting SDF file to DV360. Do you wish to continue?',
         ui.ButtonSet.YES_NO);
     if (response == ui.Button.NO) {
      return 'abort';

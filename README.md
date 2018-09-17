@@ -1,26 +1,26 @@
-# Line Item settings copier for DBM
+# Line Item settings copier for DV360
 
-A tool to copy specific settings values from an ORIGIN DBM Line Item to a one or
-more DESTINATION Line Items, using DBM Structured Data Files.
+A tool to copy specific settings values from an ORIGIN DV360 (formerly DBM) Line
+Item to a one or more DESTINATION Line Items, using DV360 Structured Data Files.
 
 ## OVERVIEW
 
 This AppScript-based tool lets you use a Google Spreadsheet to retrieve the
-current settings from am origin DBM Line Item, select one of those values
+current settings from am origin DV360 Line Item, select one of those values
 (e.g. Geotargeting) and copy it to as many destination Line Items you want.
 
-It uses DBM APIs to download the origin/destination Line Items Data in SDF
+It uses DV360 APIs to download the origin/destination Line Items Data in SDF
 format and requires users to manually upload the updated settings of the
-destination Line items in the DBM UI.
+destination Line items in the DV360 UI.
 
 The same result could be achieved manually downloading and editing the SDF
 files, but the tool leverages the APIs and Spreadsheet functionalities to
 automate the most manual steps and to easily visualize origin and destination
 values.
 
-For more information about DBM Structured Data Files, have a look at the
-DoubleClick Bid Manager Help Center:
-https://support.google.com/bidmanager/answer/6301070?hl=en
+For more information about DV360 Structured Data Files, have a look at the
+Display&Video 360 Help Center:
+https://support.google.com/displayvideo/answer/6301070?hl=en
 
 In order to use this tool you need to have valid access to the **DoubleClick Bid
 Manager APIs** through your Google Account, and you will need to enable that API
@@ -45,9 +45,9 @@ the tool (see the corresponding step of Initial Setup section below).
     and go back to the Spreadsheet.
 *   Click on the _Custom Functions_ menu (you might need to refresh the page if
     you don't see it), and select _Retrieve ORIGIN Line Item Info_: you will be
-    prompted to allow the tool to access the Spreadsheet and to use your DBM API
-    credentials to download the SDF files. This only needs to be done once (per
-    user).
+    prompted to allow the tool to access the Spreadsheet and to use your DV360
+    API credentials to download the SDF files. This only needs to be done once
+    (per user).
 
 ## USAGE
 
@@ -66,7 +66,7 @@ the tool (see the corresponding step of Initial Setup section below).
 *   List the IDs of all the destination Line Items you want to copy the
     selected setting TO under the **Destination Line Item IDs** column in
     the Destination Line Items section.
-    - Please note that all Line Items must be in the same DBM advertiser in
+    - Please note that all Line Items must be in the same DV360 advertiser in
       order to the SDF upload to work successfully.
 *   **OPTIONAL**: you can retrieve the current value of the selected setting
     for your destination Line Items - just select **Custom Functions >
@@ -89,22 +89,22 @@ the tool (see the corresponding step of Initial Setup section below).
       - You can copy multiple settings from the same origin Line Item to the
         same destination Line Items, as long as during the process you don’t
         retrieve their settings again (as that would overwrite the
-        configuration with the one currently in DBM), e.g. you only change the
+        configuration with the one currently in DV360), e.g. you only change the
         selected setting and use "Custom Functions > Copy Line Item Setting".
       - Viceversa, if you for any reason retrieve the destination Line Items
         configuration, either directly because you used "Custom Functions >
         Retrieve DESTINATION Line Items info" or indirectly because you changed
         the destination Line Items IDs, you will lose all the settings you have
         copied until that moment, because you would have re-configured them with
-        the current values in DBM (the tool will warn you with a pop-up).
+        the current values in DV360 (the tool will warn you with a pop-up).
 *   To apply these changes, you’ll need to download the SDF file of the
-    destination Line Items and upload it in DBM. In particular you need to:
+    destination Line Items and upload it in DV360. In particular you need to:
     - Switch to the _DestinationLIs_ sheet
     - Select in the main menu **File > Download As.. > Comma-separated values**
       and save the file on your computer
-    - Go to the _Insertion Orders_ page of your advertiser in DBM, and click on
-      the right-side three-dots button to select UPLOAD in the SDF drop-down
-      menu (more info on how to use SDF in DBM [at this link](https://support.google.com/bidmanager/answer/6301070))
+    - Go to the _Insertion Orders_ page of your advertiser in DV360, and click
+      on the right-side three-dots button to select UPLOAD in the SDF drop-down
+      menu (more info on how to use SDF in DV360 [at this link](https://support.google.com/displayvideo/answer/6301070))
     - Upload the SDF/CSV file you previously downloaded
     - If there are no errors, you will see the updated settings you
       selected in the spreadsheet correctly applied to your destination Line
@@ -126,6 +126,6 @@ the tool (see the corresponding step of Initial Setup section below).
     useful in case you want to make more complex changes, but you obviously need
     to be careful in editing the correct columns.
     - Please note that you could do this simply downloading the same
-      configuration structure downloading the corresponding SDF files from DBM;
-      this helps you automating the download of many Line Items at once via the
-      list of the ID in the _Config_ sheet.
+      configuration structure downloading the corresponding SDF files from
+      DV360; this helps you automating the download of many Line Items at once
+      via the list of the ID in the _Config_ sheet.

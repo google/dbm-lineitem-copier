@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright 2017 Google Inc.
+Copyright 2018 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@ Note that these code samples being shared are not official Google
 products and are not formally supported.
 ************************************************************************/
 
-// Constants for DBM API scopes and Rest API URLs.
-var DBM_API_SCOPE = 'https://www.googleapis.com/auth/doubleclickbidmanager';
+// Constants for DV360 API scopes and Rest API URLs.
 var API_URL_SDF =
     'https://www.googleapis.com/doubleclickbidmanager/v1/sdf/download';
 
@@ -27,7 +26,7 @@ var ui = SpreadsheetApp.getUi();
 
 
 /**
- * Calls the DBM API function to download SDF files.
+ * Calls the DV360 API function to download SDF files.
  * @param {string} filterType The type of filter to apply.
  * @param {string[]} filterIds Array of IDs to filter on.
  * @param {string} fileTypes The type of SDF file to download.
@@ -49,7 +48,7 @@ function getSdf_(filterType, filterIds, fileTypes, sdfVersion) {
 
 
 /**
- * Calls the DBM API via an HTTP call, previously checking if the DBM API
+ * Calls the DV360 API via an HTTP call, previously checking if the DBM API
  * service is available and authorized, otherwise prompting the user to
  * open the correct URL to authorize the API access.
  * @param {string} url The URL of the REST API call to make.
